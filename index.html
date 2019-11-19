@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Spark fronted</title>
+  </head>
+  <body>
+    <h1>Listado de estudiantes</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Edad</th>
+          <th>Carrera</th>
+        </tr>
+      </thead>
+      ak
+    </table>
+    <script>
+      (function() {
+        var App = {
+          config: {
+            api: {
+              baseUrl: "http://localhost:4567",
+              getEstudiantes: `${App.config.api.baseUrl}/`
+            }
+          },
+          htmlElements: {
+            jsResponse: document.querySelector(".js-response")
+          },
+          init: function() {
+            App.populateTable();
+          },
+          populateTable: async function() {
+            const response = await App.utils.makeRequest({
+              url: App.config.api.getEstudiantes
+            });
+            App.utils.drawTable(response);
+          },
+          utils: {
+            makeRequest: async function({ url }) {
+              const response = await fetch(url);
+              return response.json();
+            },
+            drawTable: function(students) {
+              let newStudentList = "";
+              students.group.forEach(student => {
+                newStudentList += `<tr><td>${student.name}</td><td>${student.age}</td><td>${student.career}</td></tr>`;
+              });
+              App.htmlElements.jsResponse.innerHTML = newStudentList;
+            }
+          }
+        };
+        App.init();
+      })();
+    </script>
+  </body>
+</html>
