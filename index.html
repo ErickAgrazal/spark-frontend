@@ -24,7 +24,9 @@
           config: {
             api: {
               baseUrl: "http://localhost:4567",
-              getEstudiantes: `${App.config.api.baseUrl}/`
+              getEstudiantes: function() {
+                return `${App.config.api.baseUrl}/`;
+              }
             }
           },
           htmlElements: {
@@ -35,7 +37,7 @@
           },
           populateTable: async function() {
             const response = await App.utils.makeRequest({
-              url: App.config.api.getEstudiantes
+              url: App.config.api.getEstudiantes()
             });
             App.utils.drawTable(response);
           },
@@ -46,7 +48,7 @@
             },
             drawTable: function(students) {
               let newStudentList = "";
-              students.group.forEach(student => {
+              students.group.forEach(function(student) {
                 newStudentList += `<tr><td>${student.name}</td><td>${student.age}</td><td>${student.career}</td></tr>`;
               });
               App.htmlElements.jsResponse.innerHTML = newStudentList;
