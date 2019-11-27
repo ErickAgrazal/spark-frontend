@@ -8,6 +8,23 @@
   </head>
   <body>
     <h1>Listado de estudiantes</h1>
+    <hr />
+    <form class="js-student-form" action="">
+      <label for="">Nombre:</label>
+      <input class="js-student-form-name-input" type="text" />
+      <br />
+      <br />
+      <label for="">Edad:</label>
+      <input class="js-student-form-age-input" type="text" />
+      <br />
+      <br />
+      <label for="">Carrera:</label>
+      <input class="js-student-form-career-input" type="text" />
+      <br />
+      <br />
+      <button type="submit">Guardar</button>
+    </form>
+    <hr />
     <table>
       <thead>
         <tr>
@@ -25,15 +42,46 @@
             api: {
               baseUrl: "http://localhost:4567",
               getEstudiantes: function() {
-                return `${App.config.api.baseUrl}/`;
+                return `${App.config.api.baseUrl}/estudiantes`;
+              },
+              postEstudiantes: function() {
+                return `${App.config.api.baseUrl}/estudiantes`;
               }
             }
           },
           htmlElements: {
-            jsResponse: document.querySelector(".js-response")
+            jsResponse: document.querySelector(".js-response"),
+            studentForm: document.querySelector(".js-student-form"),
+            nameInput: document.querySelector(".js-student-form-name-input"),
+            ageInput: document.querySelector(".js-student-form-age-input"),
+            careerInput: document.querySelector(".js-student-form-career-input")
           },
           init: function() {
             App.populateTable();
+            App.htmlElements.studentForm.addEventListener(
+              "submit",
+              App.events.onStudentFormSubmit
+            );
+          },
+          events: {
+            onStudentFormSubmit: async function(e) {
+              e.preventDefault();
+
+              // Read input values
+              const name = App.htmlElements.nameInput.value;
+              const age = App.htmlElements.ageInput.value;
+              const career = App.htmlElements.careerInput.value;
+
+              // Returns new students array
+              const response = await App.utils.makeRequest({
+                method: "post",
+                url: App.config.api.postEstudiantes(),
+                body: { name, age, career }
+              });
+
+              // Redraw student table
+              App.utils.drawTable(response);
+            }
           },
           populateTable: async function() {
             const response = await App.utils.makeRequest({
@@ -42,8 +90,11 @@
             App.utils.drawTable(response);
           },
           utils: {
-            makeRequest: async function({ url }) {
-              const response = await fetch(url);
+            makeRequest: async function({ method = "get", url, body = null }) {
+              const response = await fetch(url, {
+                method,
+                body: body ? JSON.stringify(body) : null
+              });
               return response.json();
             },
             drawTable: function(students) {
